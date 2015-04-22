@@ -1,0 +1,1 @@
+{"url":"base64","face_detection":[{"boundingbox":{"tl":{"x":175.22,"y":251.45},"size":{"width":427.8,"height":427.8}},"confidence":1,"pose":{"roll":-1.51,"yaw":1.5,"pitch":-4.75},"quality":{"brn":0.38,"shn":1.4}}],"ori_img_size":{"width":768,"height":1024},"usage":{"quota":19674,"status":"Succeed.","api_id":"pqbB3puEwz6xjTgW"}}

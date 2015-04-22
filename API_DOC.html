@@ -1,0 +1,79 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<title>Features extraction and face recognition API</title>
+	</head>
+	<body>
+        <h1>Features extraction and face recognition API</h1>
+        <h2>Index</h2>
+        <a href="#intro">1. Introduction</a><br>
+        <a href="#users">2. Type of users</a><br>
+        <a href="#getInfo">3. Getting data</a><br>
+        <a href="#getFeatures">(i) Features</a><br>
+        <a href="#getAttributes">(ii) Attributes</a><br>
+        <a href="#match">4. Match a new face</a>
+        <h2 id="intro">1. Introduction</h2>
+        <p>
+            There are two main actions that can be performed: get info of an existing user,
+            or find the users in the DB that better match with a new face.
+        </p>
+        <p>
+            All the responses are in JSON format.
+        </p>
+        <h2 id="users">2. Type of users</h2>
+        <p>
+            There are two type of users: the users already in the database (called simple "user"),
+            and temporally users (called "temp user").
+        </p>
+        <p>
+            An user is represented with a unique numeric identifier ("uid"). This users was added in
+            the preprocess stage, and are static. You can't add new users.
+        </p>
+        <p>
+            A temp user is represented with a temporally numeric identifier ("tempID"). This users are created
+            when you request for match a new face. The temp users are removed periodically, so it's recommended
+            store the info of this users if you want to access to this data later.
+        </p>
+        <h2 id="getInfo">3. Getting data</h2>  
+        <h3 id="getFeatures">(i) Features</h3>
+        <p>
+            Features: coordinates of eyes, ears, nose, eyebrows, lips, chin in the face and pose orientation.
+        </p>
+        <p>
+            The syntax of the query:<br>
+            <code>http://127.0.0.1:5000/features/&lt;typeUser&gt;/&lt;id&gt;</code>
+        </p>
+        <p>
+            Examples:<br>
+            <code>http://127.0.0.1:5000/features/user/627575</code><br>
+            <code>http://127.0.0.1:5000/features/temp/1234987566128</code>
+        </p>
+        <h3 id="getAttributes">(ii) Attributes</h3>
+        <p>
+            Attributes: race, age, glasses, beard, and more, each with its respective probabilities.
+        </p>
+        <p>
+            The syntax of the query:<br>
+            <code>http://127.0.0.1:5000/attributes/&lt;typeUser&gt;/&lt;id&gt;</code>
+        </p>
+        <p>
+            Examples:<br>
+            <code>http://127.0.0.1:5000/attributes/user/627575</code><br>
+            <code>http://127.0.0.1:5000/attributes/temp/1234987566128</code>
+        </p>
+        <h2 id="match"> Match a new face</h2>
+        <p>
+            This query take an image URL, create a temp user, detect the face, extract features, normalize,
+            ask for matches and return a list of candidates (with its respective probabilities) and the tempID
+            of the temp user.
+        </p>
+        <p>
+            The syntax of the query:<br>
+            <code>http://127.0.0.1:5000/match?urlImage=&lt;url of the image&gt;</code>
+        </p>
+        <p>
+            Example:<br>
+            <code>http://127.0.0.1:5000/match?urlImage=http://www.example.com/path/myImage.jpg</code>
+        </p>
+	</body>
+</html> 

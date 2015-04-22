@@ -1,0 +1,59 @@
+from flask import Flask
+from flask import request
+import faceAPI
+import jsonResponse
+
+app = Flask(__name__)
+
+@app.route("/match")
+def match():
+    """/match?imageUrl=http://...
+        Match the face in imageUrl against the dataset
+    """
+    
+    if ( request.args.get("imageUrl") ):
+        imageUrl = request.args.get("imageUrl")
+    else:
+        app.logger.debug("Llegueeee")
+        return jsonResponse.errorJson("imageUrl parameter required")
+
+    resp = faceAPI.normalize(imageUrl) 
+
+    if ( resp[0] == 0):
+        return jsonResponse.errorJson("There was an error in normalize: %s" % resp[1])
+
+    tempID = resp[0]
+    if ( not faceAPI.getAttributes(tempID) ):
+       return jsonResponse.errorJson("There was an error with getAttributes")
+
+    #search cluster
+    cluster = "cluster1"
+
+    resp = faceAPI.faceRecognize(tempID,cluster)
+
+    if ( resp[0] ):
+        return jsonResponse.toJson(resp[1])
+    else:
+        return jsonResponse.errorJson("There was an error in faceRecognize")
+
+@app.route("/features/<typ>/<int:uid>")
+def features (uid,typ):
+    path = "%s/%s/FEAT.json" % (typ,uid)
+    if ( typ != "user" and typ != "temp" ):
+        errorMessage = "The type user '%s' doesn't exist" % typ
+    else:
+        errorMessage = "The %s %s doesn't exist" % (typ,uid)
+    return jsonResponse.toJson(jsonResponse.getJson(path,errorMessage))
+
+@app.route("/attributes/<typ>/<int:uid>")
+def attributes (uid,typ):
+    path = "%s/%s/ATTR.json" % (typ,uid)
+    if ( typ != "user" and typ != "temp" ):
+        errorMessage = "The type user '%s' doesn't exist" % typ
+    else:
+        errorMessage = "The %s %s doesn't exist" % (typ,uid)
+    return jsonResponse.toJson(jsonResponse.getJson(path,errorMessage))
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run()

@@ -1,0 +1,191 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<title>PHP SDK for features extraction and face recognition API</title>
+	</head>
+	<body>
+        <h1>PHP SDK for features extraction and face recognition API</h1>
+        <h2>Index</h2>
+        <a href="#intro">1. Introduction</a><br>
+        <a href="#users">2. Type of users</a><br>
+        <a href="#subject">3. Subject class (getting data)</a><br>
+        <a href="#subjectCons">(i) Constructor</a><br>
+        <a href="#subjeMethods">(ii) Methods</a><br>
+        <a href="#sgetUID">Subject::getUID()</a><br>
+        <a href="#sgetFeatures">Subject::getFeatures()</a><br>
+        <a href="#sgetAttributes">Subject::getAttributes()</a><br>
+        <a href="#faceRecognition">3. FaceRecognition class (matching faces)</a><br>
+        <a href="#faceRecognitionCons">(i) Constructor</a><br>
+        <a href="#faceRecognitionMethods">(ii) Methods</a><br>
+        <a href="#fgetUrl">FaceRecognition::getUrlImage()</a><br>
+        <a href="#fmatch">FaceRecognition::match()</a><br>
+        <a href="#fgetCandidates">FaceRecognition::getCandidates()</a><br>
+        <a href="#fgetFeatures">FaceRecognition::getFeatures()</a><br>
+        <a href="#fgetAttributes">FaceRecognition::getAttributes()</a><br>
+        <h2 id="intro">1. Introduction</h2>
+        <p>
+            There are two main main class: "Subject", to get info of an existing user,
+            and "FaceRecognition", to find the users in the DB that better match with a new face.
+        </p>
+        <p>
+            There are two test files. You can run them directly, and see the results in a console or a browser.
+            Just remember that the API server must be running every time you want use this SDK.
+        </p>
+        <h2 id="users">2. Type of users</h2>
+        <p>
+            There are two type of users: the users already stored in the database (called "user"),
+            and temporally users (called "temp user").
+        </p>
+        <p>
+            An user is represented with a unique numeric identifier ("uid"). Users were added in
+            the preprocess stage, and will remain static. You can't add new users.
+        </p>
+        <p>
+            A temp user is represented with a temporally numeric identifier ("tempID"). This users are created
+            when a request to match a new face is performed. The temp users will be remove periodically, so it's recommended
+            to store the info of this users if you want to access to this data later.
+        </p>
+        <h2 id="subject">3. Subject class (getting data)</h2>  
+        <p> You must include the Subject.php file.</p>
+        <h3 id="subjectCons">(i) Constructor</h3>
+        <p>
+            Takes the UID of an user of the database.
+        </p>
+        <p>
+            Syntax:<br>
+            <pre>new Subject($uid);</pre>
+            $uid must be an string or a number
+        </p>
+        <p>
+            Examples:<br>
+            <pre>$mySubject = new Subject(627575);</pre>
+            <pre>$mySubject = new Subject("627575");</pre>
+            Both examples will return the same Subject object.
+        </p>
+        <h3 id="subjectMethods">(ii) Methods</h3>
+        <h4 id="sgetUID">Subject::getUID()</h4>
+        <p>
+            Returns the UID of the subject
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $uid = $mySubject->getUID;
+                echo $uid;
+            </pre>
+        </p>
+        <h4 id="sgetFeatures">Subject::getFeatures()</h4>
+        <p>
+            Returns an associative array with the features of the subject's face.<br>
+            Features: coordinates of eyes, ears, nose, eyebrows, lips, chin in the face and pose orientation.
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $feat = $mySubject->getFeatures();
+                echo $feat["images"][0]["faces"][0]["lipCornerLeftY"];
+            </pre>
+        </p>
+        <h4 id="sgetAttributes">Subject::getAttributes()</h4>
+        <p>
+            Returns an associative array with the attributes of the subject.<br>
+            Attributes: race, age, glasses, beard, and more, some with its respective probabilities. 
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $attr = $mySubject->getAttributes();
+                echo $attr["face_detection"][0]["age"];
+            </pre>
+        </p>
+        <h2 id="faceRecognition">4. FaceRecognition class (matching faces)</h2>  
+        <p> You must include the FaceRecognition.php file.</p>
+        <h3 id="faceRecognitionCons">(i) Constructor</h3>
+        <p>
+            Takes the url of the image that you want to match.
+        </p>
+        <p>
+            Syntax:<br>
+            <pre>new faceRecognition($url);</pre>
+        </p>
+        <p>
+            Examples:<br>
+            <pre>$face = new FaceRecognition("http://www.example.com/path/image.jpg");</pre>
+        </p>
+        <h3 id="faceRecognitionMethods">(ii) Methods</h3>
+        <h4 id="fgetUrl">faceRecognition::getImageUrl()</h4>
+        <p>
+            Returns the image Url.
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $url = $face->getImageUrl;
+                echo $url;
+            </pre>
+        </p>
+        <h4 id="fmatch">FaceRecognition::match()</h4>
+        <p>
+            This is the main process. You must call this method before using any of the next methods.
+            This process detects the face in the image used in the constructor and creates a temporal user.
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $face->match;
+            </pre>
+        </p>
+        <h4 id="fgetCandidates">FaceRecognition::getCandidates()</h4>
+        <p>
+            Returns an array with the candidates users identified in the image, and their respective probabilities.<br>
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $feat = $face->getCandidates();
+                echo $feat["images"][0]["faces"][0]["lipCornerLeftY"];
+            </pre>
+            Response:
+            <pre>
+                Array(
+                    [0] => Array (
+                            [tag] => Tal_Slobodkin
+                            [score] => 1.00
+                        )
+                    [1] => Array (
+                            [tag] => Igal_Raich
+                            [score] => 0.66
+                        )
+                    [2] => Array (
+                            [tag] => Ori_Tuvia
+                            [score] => 0.58
+                        )
+                )
+            </pre>
+        </p>
+        <h4 id="fgetFeatures">FaceRecognition::getFeatures()</h4>
+        <p>
+            Return an associative array with the features of the temporal user's face.<br>
+            Features: coordinates of eyes, ears, nose, eyebrows, lips, chin in the face and pose orientation.
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $feat = $face->getFeatures();
+                echo $feat["images"][0]["faces"][0]["lipCornerLeftY"];
+            </pre>
+        </p>
+        <h4 id="fgetAttributes">FaceRecognition::getAttributes()</h4>
+        <p>
+            Return an associative array with the attributes of the temporal user.<br>
+            Attributes: race, age, glasses, beard, and more, some with its respective probabilities. 
+        </p>
+        <p>
+            Example:<br>
+            <pre>
+                $attr = $face->getAttributes();
+                echo $attr["face_detection"][0]["age"];
+            </pre>
+        </p>
+	</body>
+</html> 
